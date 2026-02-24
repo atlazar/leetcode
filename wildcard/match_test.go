@@ -40,6 +40,12 @@ func TestIsMatch(t *testing.T) {
 			want: true,
 		},
 		{
+			t:    "wildcard in the beginning",
+			s:    "xat",
+			p:    "*at",
+			want: true,
+		},
+		{
 			t:    "empty pattern non empty string",
 			s:    "aa",
 			p:    "",
@@ -50,6 +56,12 @@ func TestIsMatch(t *testing.T) {
 			s:    "aaabbbaabaaaaababaabaaabbabbbbbbbbaabababbabbbaaaaba",
 			p:    "a*******b",
 			want: false,
+		},
+		{
+			t:    "multiple wildcard empty string",
+			s:    "",
+			p:    "******",
+			want: true,
 		},
 		{
 			t:    "complex multiple wildcard pattern",

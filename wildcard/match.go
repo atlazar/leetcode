@@ -1,12 +1,14 @@
 package wildcard
 
-import "strings"
-
 func isMatch(s string, p string) bool {
 	// s is empty
 	if s == "" {
-		p = strings.Trim(p, "*")
-		return p == ""
+		for _, ch := range p {
+			if ch != '*' {
+				return false
+			}
+		}
+		return true
 	}
 
 	// s is non-empty
@@ -15,18 +17,25 @@ func isMatch(s string, p string) bool {
 	}
 
 	// s and p are both non-empty
-	switch p[0] {
-	case '?':
-		return isMatch(s[1:], p[1:])
-	case '*':
-		for len(p) > 1 && p[1] == '*' {
-			p = p[1:]
+	i, j := 0, 0
+	for i < len(s) && j < len(p) {
+		switch {
+		case p[j] == '?' || s[i] == p[j]:
+			i++
+			j++
+		case p[j] == '*':
+			for j+1 < len(p) && p[j+1] == '*' {
+				j++
+			}
+			if j+1 < len(p) && (p[j+1] == '?' || s[i] == p[j+1]) {
+				if isMatch(s[i:], p[j+1:]) {
+					return true
+				}
+			}
+			i++
+		default:
+			return false
 		}
-		return isMatch(s, p[1:]) || isMatch(s[1:], p)
-	default:
-		if s[0] == p[0] {
-			return isMatch(s[1:], p[1:])
-		}
-		return false
 	}
+	return isMatch(s[i:], p[j:])
 }
