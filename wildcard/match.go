@@ -17,25 +17,27 @@ func isMatch(s string, p string) bool {
 	}
 
 	// s and p are both non-empty
-	i, j := 0, 0
-	for i < len(s) && j < len(p) {
+	si, pi := 0, 0
+	sj, pj := len(s)-1, len(p)-1
+	for si <= sj && pi <= pj {
 		switch {
-		case p[j] == '?' || s[i] == p[j]:
-			i++
-			j++
-		case p[j] == '*':
-			for j+1 < len(p) && p[j+1] == '*' {
-				j++
+		case p[pi] == '?' || s[si] == p[pi]:
+			si++
+			pi++
+		case p[pi] == '*':
+			for pi+1 <= pj && p[pi+1] == '*' {
+				pi++
 			}
-			if j+1 < len(p) && (p[j+1] == '?' || s[i] == p[j+1]) {
-				if isMatch(s[i:], p[j+1:]) {
+			if pi+1 <= pj && (p[pi+1] == '?' || s[si] == p[pi+1]) {
+				// * as empty substring
+				if isMatch(s[si:], p[pi+1:pj+1]) {
 					return true
 				}
 			}
-			i++
+			si++
 		default:
 			return false
 		}
 	}
-	return isMatch(s[i:], p[j:])
+	return isMatch(s[si:sj+1], p[pi:pj+1])
 }
