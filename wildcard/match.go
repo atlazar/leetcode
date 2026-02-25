@@ -21,18 +21,30 @@ func isMatch(s string, p string) bool {
 	sj, pj := len(s)-1, len(p)-1
 	for si <= sj && pi <= pj {
 		switch {
+		case p[pi] != '?' && p[pi] != '*' && s[si] != p[pi]:
+			return false
+		case p[pj] != '?' && p[pj] != '*' && s[sj] != p[pj]:
+			return false
 		case p[pi] == '?' || s[si] == p[pi]:
 			si++
 			pi++
+		case p[pj] == '?' || s[sj] == p[pj]:
+			sj--
+			pj--
+		case pi+1 <= pj && p[pi] == '*' && p[pi+1] == '*':
+			pi++
+		case pi <= pj-1 && p[pj-1] == '*' && p[pj] == '*':
+			pj--
+		case p[pi] == '*' && (pi+1 > pj || (p[pi+1] != '?' && p[pi+1] != s[si])):
+			//Can consume current begin character only as wildcard
+			si++
+		case p[pj] == '*' && (pi > pj-1 || (p[pj-1] != '?' && p[pj-1] != s[sj])):
+			//Can consume current end character only as wildcard
+			sj--
 		case p[pi] == '*':
-			for pi+1 <= pj && p[pi+1] == '*' {
-				pi++
-			}
-			if pi+1 <= pj && (p[pi+1] == '?' || s[si] == p[pi+1]) {
-				// * as empty substring
-				if isMatch(s[si:], p[pi+1:pj+1]) {
-					return true
-				}
+			// try to represent * in begin as empty substring
+			if isMatch(s[si:sj+1], p[pi+1:pj+1]) {
+				return true
 			}
 			si++
 		default:
