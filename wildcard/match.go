@@ -1,5 +1,12 @@
 package wildcard
 
+type matchKey struct {
+	s string
+	p string
+}
+
+var cache = make(map[matchKey]bool)
+
 func isMatch(s string, p string) bool {
 	// s is empty
 	if s == "" {
@@ -43,7 +50,16 @@ func isMatch(s string, p string) bool {
 			sj--
 		case p[pi] == '*':
 			// try to represent * in begin as empty substring
-			if isMatch(s[si:sj+1], p[pi+1:pj+1]) {
+			k := matchKey{
+				s: s[si : sj+1],
+				p: p[pi+1 : pj+1],
+			}
+			if match, ok := cache[k]; ok {
+				return match
+			}
+			match := isMatch(k.s, k.p)
+			cache[k] = match
+			if match {
 				return true
 			}
 			si++
